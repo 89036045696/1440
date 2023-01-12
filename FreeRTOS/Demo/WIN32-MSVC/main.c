@@ -28,7 +28,7 @@
  * This project provides two demo applications.  A simple blinky style project,
  * and a more comprehensive test and demo application.  The
  * mainCREATE_SIMPLE_BLINKY_DEMO_ONLY setting is used to select between the two.
- * The simply blinky demo is implemented and described in main_blinky.c.  The
+ * The simply blinky demo is implemented and described in main_xmodem.c.  The
  * more comprehensive test and demo application is implemented and described in
  * main_full.c.
  *
@@ -68,12 +68,12 @@
  * mainCREATE_SIMPLE_BLINKY_DEMO_ONLY setting is used to select between the two.
  *
  * If mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is 1 then the blinky demo will be built.
- * The blinky demo is implemented and described in main_blinky.c.
+ * The blinky demo is implemented and described in main_xmodem.c.
  *
  * If mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is not 1 then the comprehensive test and
  * demo application will be built.  The comprehensive test and demo application is
  * implemented and described in main_full.c. */
-#define mainCREATE_SIMPLE_BLINKY_DEMO_ONLY    0
+#define mainCREATE_SIMPLE_BLINKY_DEMO_ONLY    1
 
 /* This demo uses heap_5.c, and these constants define the sizes of the regions
  * that make up the total heap.  heap_5 is only used for test and example purposes
@@ -95,10 +95,10 @@
 /*-----------------------------------------------------------*/
 
 /*
- * main_blinky() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 1.
+ * main_xmodem() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 1.
  * main_full() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 0.
  */
-extern void main_blinky( void );
+extern void main_xmodem( void );
 extern void main_full( void );
 
 /*
@@ -150,10 +150,6 @@ static DWORD WINAPI prvWindowsKeyboardInputThread( void * pvParam );
  */
 static uint32_t prvKeyboardInterruptHandler( void );
 
-/*
- * Keyboard interrupt handler for the blinky demo. 
- */
-extern void vBlinkyKeyboardInterruptHandler( int xKeyPressed );
 
 /*-----------------------------------------------------------*/
 
@@ -219,7 +215,7 @@ int main( void )
      * of this file. */
     #if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
         {
-            main_blinky();
+            main_xmodem();
         }
     #else
         {
@@ -488,7 +484,7 @@ static uint32_t prvKeyboardInterruptHandler(void)
         #if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
             {
                 /* Call the keyboard interrupt handler for the blinky demo. */
-                vBlinkyKeyboardInterruptHandler( xKeyPressed );
+                //vBlinkyKeyboardInterruptHandler( xKeyPressed );
             }
         #endif
     break;

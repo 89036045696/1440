@@ -126,9 +126,10 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="main_blinky.c" />
     <ClCompile Include="main_full.c" />
+    <ClCompile Include="main_xmodem.c" />
     <ClCompile Include="Run-time-stats-utils.c" />
+    <ClCompile Include="xmodem-1.0\xmodem.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\Include\trcKernelPort.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="Trace_Recorder_Configuration\trcKernelPortConfig.h" />
     <ClInclude Include="Trace_Recorder_Configuration\trcKernelPortSnapshotConfig.h" />
     <ClInclude Include="Trace_Recorder_Configuration\trcSnapshotConfig.h" />
+    <ClInclude Include="xmodem-1.0\xmodem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

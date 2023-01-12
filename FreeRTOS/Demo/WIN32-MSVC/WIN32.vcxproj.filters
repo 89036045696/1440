@@ -15,10 +15,6 @@
     <Filter Include="FreeRTOS Source\Include">
       <UniqueIdentifier>{a60060e3-3949-4f60-b025-cb84164ae9ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo App Source">
-      <UniqueIdentifier>{34567deb-d5ab-4a56-8640-0aaec609521a}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
-    </Filter>
     <Filter Include="FreeRTOS Source\Source\Portable">
       <UniqueIdentifier>{88f409e6-d396-4ac5-94bd-7a99c914be46}</UniqueIdentifier>
     </Filter>
@@ -26,25 +22,32 @@
       <UniqueIdentifier>{19ff1a34-36de-4c48-9d10-3fb1fa0d1fa4}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
-    <Filter Include="Demo App Source\FreeRTOS+Trace Recorder">
+    <Filter Include="App Source">
+      <UniqueIdentifier>{34567deb-d5ab-4a56-8640-0aaec609521a}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="App Source\FreeRTOS+Trace Recorder">
       <UniqueIdentifier>{90b56567-bab6-4d92-b319-b514d378329d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo App Source\Full_Demo">
+    <Filter Include="App Source\FreeRTOS+Trace Recorder\include">
+      <UniqueIdentifier>{5cb8735d-498f-40aa-bf5c-9d41923b7968}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App Source\Full_Demo">
       <UniqueIdentifier>{4ae1665e-a7bb-4c1a-81a3-531d883e6f2d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo App Source\Full_Demo\Common Demo Tasks">
+    <Filter Include="App Source\Full_Demo\Common Demo Tasks">
       <UniqueIdentifier>{2d4a700c-06e3-4dd2-afbe-ab1be71ebe2a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo App Source\Blinky_Demo">
-      <UniqueIdentifier>{fb86fa48-ac27-4f87-9215-ce9e1a1a85f9}</UniqueIdentifier>
+    <Filter Include="App Source\xmodem 1.0">
+      <UniqueIdentifier>{e18da283-4847-4de7-9066-a89b342b6e86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo App Source\FreeRTOS+Trace Recorder\include">
-      <UniqueIdentifier>{5cb8735d-498f-40aa-bf5c-9d41923b7968}</UniqueIdentifier>
+    <Filter Include="App Source\MainTasks">
+      <UniqueIdentifier>{fb86fa48-ac27-4f87-9215-ce9e1a1a85f9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
-      <Filter>Demo App Source</Filter>
+      <Filter>App Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\list.c">
       <Filter>FreeRTOS Source\Source</Filter>
@@ -59,55 +62,55 @@
       <Filter>FreeRTOS Source\Source\Portable</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\flop.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\GenQTest.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\integer.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\PollQ.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\QPeek.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\semtest.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\BlockQ.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\blocktim.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\timers.c">
       <Filter>FreeRTOS Source\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\timerdemo.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\countsem.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\death.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\dynamic.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\QueueSet.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Run-time-stats-utils.c">
-      <Filter>Demo App Source</Filter>
+      <Filter>App Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\QueueOverwrite.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\EventGroupsDemo.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\event_groups.c">
       <Filter>FreeRTOS Source\Source</Filter>
@@ -116,52 +119,55 @@
       <Filter>FreeRTOS Source\Source\Portable</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\IntSemTest.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\TaskNotify.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\QueueSetPolling.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\recmutex.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="main_full.c">
-      <Filter>Demo App Source\Full_Demo</Filter>
-    </ClCompile>
-    <ClCompile Include="main_blinky.c">
-      <Filter>Demo App Source\Blinky_Demo</Filter>
+      <Filter>App Source\Full_Demo</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\StaticAllocation.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\AbortDelay.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\trcKernelPort.c">
-      <Filter>Demo App Source\FreeRTOS+Trace Recorder</Filter>
+      <Filter>App Source\FreeRTOS+Trace Recorder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\trcSnapshotRecorder.c">
-      <Filter>Demo App Source\FreeRTOS+Trace Recorder</Filter>
+      <Filter>App Source\FreeRTOS+Trace Recorder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\stream_buffer.c">
       <Filter>FreeRTOS Source\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\MessageBufferDemo.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\StreamBufferDemo.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\StreamBufferInterrupt.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\MessageBufferAMP.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Minimal\TaskNotifyArray.c">
-      <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
+      <Filter>App Source\Full_Demo\Common Demo Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="xmodem-1.0\xmodem.c">
+      <Filter>App Source\xmodem 1.0</Filter>
+    </ClCompile>
+    <ClCompile Include="main_xmodem.c">
+      <Filter>App Source\MainTasks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -217,10 +223,13 @@
       <Filter>Configuration Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\Include\trcKernelPort.h">
-      <Filter>Demo App Source\FreeRTOS+Trace Recorder\include</Filter>
+      <Filter>App Source\FreeRTOS+Trace Recorder\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\Include\trcRecorder.h">
-      <Filter>Demo App Source\FreeRTOS+Trace Recorder\include</Filter>
+      <Filter>App Source\FreeRTOS+Trace Recorder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="xmodem-1.0\xmodem.h">
+      <Filter>App Source\xmodem 1.0</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
