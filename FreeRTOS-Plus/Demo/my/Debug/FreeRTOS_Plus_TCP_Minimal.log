@@ -1,0 +1,5 @@
+﻿  main.c
+  MyUDPClientTasks.c
+D:\Work\Bureau1440\prj\FreeRTOS-Plus\Demo\my\myTasks\MyUDPClientTasks.c(26,6): error C2084: функция "void taskUDPClient1(void *)" уже имеет текст реализации
+D:\Work\Bureau1440\prj\FreeRTOS-Plus\Demo\my\myTasks\MyUDPClientTasks.c(21): message : см. предыдущее определение "taskUDPClient1"
+  Создание кода...

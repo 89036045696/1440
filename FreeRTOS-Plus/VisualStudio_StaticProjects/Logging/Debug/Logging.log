@@ -1,0 +1,3 @@
+﻿  Logging_WinSim.c
+D:\Work\Bureau1440\prj\FreeRTOS-Plus\Demo\Common\Logging\windows\Logging_WinSim.c(201,93): warning C4133: функция: несовместимые типы - из "char [19]" в "LPCWSTR"
+  Logging.vcxproj -> D:\Work\Bureau1440\prj\FreeRTOS-Plus\Demo\FreeRTOS_Plus_TCP_Minimal_Windows_Simulator\Debug\Logging.lib

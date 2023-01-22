@@ -1,0 +1,1 @@
+D:\Work\Bureau1440\prj\FreeRTOS-Plus\VisualStudio_StaticProjects\FreeRTOS-Kernel\build\FreeRTOS-Kernel\Win32\Debug\FreeRTOS-Kernel.lib

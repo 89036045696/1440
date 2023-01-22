@@ -1,0 +1,31 @@
+﻿  FreeRTOS_ARP.c
+  FreeRTOS_DHCP.c
+  FreeRTOS_DNS.c
+  FreeRTOS_DNS_Cache.c
+  FreeRTOS_DNS_Callback.c
+  FreeRTOS_DNS_Networking.c
+  FreeRTOS_DNS_Parser.c
+  FreeRTOS_ICMP.c
+  FreeRTOS_IP.c
+  FreeRTOS_IP_Timers.c
+  FreeRTOS_IP_Utils.c
+  FreeRTOS_Sockets.c
+  FreeRTOS_Stream_Buffer.c
+  FreeRTOS_TCP_IP.c
+  FreeRTOS_TCP_Reception.c
+  FreeRTOS_TCP_State_Handling.c
+  FreeRTOS_TCP_Transmission.c
+  FreeRTOS_TCP_Utils.c
+  FreeRTOS_TCP_WIN.c
+  FreeRTOS_Tiny_TCP.c
+  Создание кода...
+  Компиляция...
+  FreeRTOS_UDP_IP.c
+  BufferAllocation_2.c
+  tcp_dump_packets.c
+  tcp_mem_stats.c
+  tcp_netstat.c
+  NetworkInterface_WinPCap.c
+  plus_tcp_hooks_winsim.c
+  Создание кода...
+  FreeRTOS+TCP.vcxproj -> D:\Work\Bureau1440\prj\FreeRTOS-Plus\VisualStudio_StaticProjects\FreeRTOS+TCP\build\FreeRTOS+TCP\Win32\Debug\FreeRTOS+TCP.lib
