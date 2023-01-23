@@ -6,7 +6,8 @@
 struct TagParamsOfUDPConnectionTask
 {
     Socket_t ClientSocket;
-    struct freertos_sockaddr DestinationAddress;
+    struct freertos_sockaddr * PtrDestinationAddress;
+    uint32_t SourceAddressLength;
 };
 
 

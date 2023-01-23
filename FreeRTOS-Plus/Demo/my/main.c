@@ -354,7 +354,7 @@ void vStartMyUDPClientTasks(uint16_t usStackSize, uint32_t ulPort, UBaseType_t u
     socket on the same IP address.  Setup the freertos_sockaddr structure with
     this nodes IP address, and the port number being sent to.  The strange
     casting is to try and remove compiler warnings on 32 bit machines. */
-    struct freertos_sockaddr addressDestination;
+    static struct freertos_sockaddr addressDestination;
     addressDestination.sin_addr = ulIPAddress;
     addressDestination.sin_port = FreeRTOS_htons((uint16_t)ulPort);
     /* Create a UDP socket. */
@@ -367,7 +367,9 @@ void vStartMyUDPClientTasks(uint16_t usStackSize, uint32_t ulPort, UBaseType_t u
     configASSERT(FreeRTOS_bind(socketUDP, &sockaddrLocal, sizeof(struct freertos_sockaddr)) == 0);
 
     static struct TagParamsOfUDPConnectionTask params;
-    params.ClientSocket = socketUDP;
+    params.ClientSocket = socketUDP; /* in heap */
+    params.PtrDestinationAddress = & addressDestination;
+    params.SourceAddressLength = sizeof(struct freertos_sockaddr);
     /* Create the client and server tasks that do not use the zero copy
     interface. */
     BaseType_t status;
@@ -375,4 +377,6 @@ void vStartMyUDPClientTasks(uint16_t usStackSize, uint32_t ulPort, UBaseType_t u
     configASSERT(pdTRUE == status);
     status = xTaskCreate(task2UDPConnection, "UDPClient2", usStackSize, (void*)&params, uxPriority, NULL);
     configASSERT(pdTRUE == status);
+
+    // TODO: close socket
 }
