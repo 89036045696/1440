@@ -103,20 +103,20 @@ void task1UDPConnection( void *pvParameters )
 {
     QueueSendHandle = xQueueCreate(1, sizeof(union TagTxBuffer));
 
-
-    // RX blocking time = infinity
-    const TickType_t rxTimeOut = portMAX_DELAY;
-    FreeRTOS_setsockopt(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
-        0,
-        FREERTOS_SO_RCVTIMEO,
-        &rxTimeOut,
-        sizeof(rxTimeOut));
-
     union TagRxBuffer rxBuf;
     union TagTxBuffer txBuf;
     while (1)
     {
         /* Read new RX packet with command */
+
+        // RX blocking time = infinity
+        const TickType_t rxTimeOut = portMAX_DELAY;
+        FreeRTOS_setsockopt(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
+            0,
+            FREERTOS_SO_RCVTIMEO,
+            &rxTimeOut,
+            sizeof(rxTimeOut));
+
         int32_t rxNum = FreeRTOS_recvfrom(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
             &rxBuf, sizeof(rxBuf),
             0 /* ulFlags with the FREERTOS_ZERO_COPY bit clear. */,
