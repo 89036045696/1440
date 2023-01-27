@@ -17,14 +17,20 @@
 
 #include "ConnectionTasks.h"
 
+//------------------------------------------------------------------------------
+
 #ifdef WIN32
-#define PACKED #pragma pack(push,1)
-#else // POSIX, ARDUINO
+#define PACKED
+#else
+// POSIX, ARDUINO
 #define PACKED __attribute__((__packed__))
 #endif
 
+//------------------------------------------------------------------------------
 
-/*-----------------------------------------------------------*/
+#define SETTING__NUM_PACKETS_MAX  ((uint8_t) 8) // макс. количество "одновременно" обрабатываемых 
+
+//------------------------------------------------------------------------------
 
 QueueHandle_t QueueSendHandle;
 
@@ -50,7 +56,7 @@ union TagRxBuffer
         uint8_t Id;
         uint8_t Cmd;
         uint32_t RegAddr;       // network endian
-    } FormatCmdRead;
+    } PACKED FormatCmdRead;
 
     struct TagRxBufFormatCmdWrite
     {
@@ -58,14 +64,14 @@ union TagRxBuffer
         uint8_t Cmd;
         uint32_t RegAddr;       // network endian
         uint32_t ValueToWrite;  // network endian
-    } FormatCmdWrite;
+    } PACKED FormatCmdWrite;
 
     struct TagRxBufFormatAckReply
     {
         uint8_t Id;
         uint8_t AckReply;
-    } FormatAckReply;
-};
+    } PACKED FormatAckReply;
+} PACKED;
 #ifdef WIN32
 // restore default packing
 #pragma pack(pop)
@@ -83,20 +89,21 @@ union TagTxBuffer
     {
         uint8_t Id;
         uint32_t RDataOrWStatus;      // network endian
-    } FormatCmdAnswer;
+    } PACKED FormatCmdAnswer;
 
     struct TagTxBufFormatAckRequest
     {
         uint8_t Id;
         uint8_t AckRequest;
-    } FormatAckRequest;
-};
+    } PACKED FormatAckRequest;
+} PACKED;
 #ifdef WIN32
 // restore default packing
 #pragma pack(pop)
 #endif
+//------------------------------------------------------------------------------
 
-enum ExchangeStatesIds
+enum TagExchangeStatesIds
 {
     ID_EXCHANGE_STATE__NONE               = 0,
     ID_EXCHANGE_STATE__ACK_REQUEST,                 // инициирована отправка сообщения ACK_REQUEST
@@ -104,13 +111,25 @@ enum ExchangeStatesIds
     ID_EXCHANGE_STATE__RECEIVED_REPEAT              // принято сообщение с повторным статусом (т.е. команду из пакета повторно выполнять не нужно и ответный пакет тоже уже сформирован - отправить ACk и исходящий пакет)
 };
 
+//------------------------------------------------------------------------------
+
+struct TagTxContext
+{
+    union TagTxBuffer    packet;
+    uint8_t              sizeOfPacket;
+};
+
+//==============================================================================
 
 void task1UDPConnection( void *pvParameters )
 {
-    QueueSendHandle = xQueueCreate(1, sizeof(union TagTxBuffer));
+    QueueSendHandle = xQueueCreate(SETTING__NUM_PACKETS_MAX, sizeof(struct TagTxContext));
 
-    union TagRxBuffer rxBuf;
-    union TagTxBuffer txBuf;
+    union TagRxBuffer         rxBuffers[SETTING__NUM_PACKETS_MAX];
+    struct TagTxContext       txItems[SETTING__NUM_PACKETS_MAX];
+    enum TagExchangeStatesIds states[SETTING__NUM_PACKETS_MAX];
+    uint8_t currPacketId;
+
     while (1)
     {
         /* Перед новым приёмом 
@@ -151,7 +170,7 @@ void task1UDPConnection( void *pvParameters )
         txBuf.FormatAckRequest.AckRequest = CMD_ACK;
         // TODO: 
          /*TODO: размер пакета передавать в очереди*/
-        while (pdTRUE != xQueueSendToBack(QueueSendHandle, &txBuf, 1)) { ; }
+        while (pdTRUE != xQueueSendToBack(QueueSendHandle, &txItem, 1)) { ; }
 
         /* Parse cmd packet, execute command and build tx packet */
         uint32_t regReadValOrWriteStatus;
@@ -187,7 +206,7 @@ void task1UDPConnection( void *pvParameters )
         {
             /*TODO: размер пакета tx передавать в очереди*/
             // TODO: 
-            while (pdTRUE != xQueueSendToBack(QueueSendHandle, &txBuf, 1)) { ; }
+            while (pdTRUE != xQueueSendToBack(QueueSendHandle, &txItem, 1)) { ; }
 
             int32_t rxNum = FreeRTOS_recvfrom(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
                 &rxBuf, sizeof(rxBuf.FormatAckReply),
@@ -205,7 +224,7 @@ void task1UDPConnection( void *pvParameters )
 
     }
 }
-/*-----------------------------------------------------------*/
+//==============================================================================
 void task2UDPConnection(void* pvParameters)
 {
     while (QueueSendHandle == NULL) { ; }
@@ -218,10 +237,10 @@ void task2UDPConnection(void* pvParameters)
         &txTimeOutMax,
         sizeof(txTimeOutMax));
 
-    union TagTxBuffer txBuf;
+    union TagTxContext txItem;
     while (1)
     {
-        while (pdTRUE != xQueueReceive( QueueSendHandle, &txBuf, portMAX_DELAY)) { ; }
+        while (pdTRUE != xQueueReceive( QueueSendHandle, &txItem, portMAX_DELAY)) { ; }
 
         /*TODO: размер пакета tx передавать в очереди*/
         // Размер пакета отправляемых данных разный, и зависит от кода команды в нём
@@ -236,4 +255,4 @@ void task2UDPConnection(void* pvParameters)
         );
     }
 }
-/*-----------------------------------------------------------*/
+//==============================================================================
