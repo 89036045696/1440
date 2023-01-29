@@ -28,7 +28,7 @@
 
 //------------------------------------------------------------------------------
 
-#define SETTING__NUM_PACKETS_MAX  ((uint8_t) 8) // макс. количество "одновременно" обрабатываемых 
+#define SETTING__NUM_PACKETS_MAX  ((uint8_t) 8) // макс. количество находящихся в обработке уникальных входящих пакетов
 
 //------------------------------------------------------------------------------
 
@@ -102,12 +102,13 @@ union TagTxBuffer
 #pragma pack(pop)
 #endif
 //------------------------------------------------------------------------------
-
+// состояния обработки одного сообщения
 enum TagExchangeStatesIds
 {
     ID_EXCHANGE_STATE__NONE               = 0,
     ID_EXCHANGE_STATE__ACK_REQUEST,                 // инициирована отправка сообщения ACK_REQUEST
     ID_EXCHANGE_STATE__WAIT_ACK_REPLY,              // инициирована отправка ответного сообщения и происходит ожидание ответа ACK_REPLY
+    ID_EXCHANGE_STATE__NEED_REPEAT_REPLY,           // истёк тайм-аут ожидания ответа ACK_REPLY и количество повторных ответов не истекло: нужно повторить ответ
     ID_EXCHANGE_STATE__RECEIVED_REPEAT              // принято сообщение с повторным статусом (т.е. команду из пакета повторно выполнять не нужно и ответный пакет тоже уже сформирован - отправить ACk и исходящий пакет)
 };
 
@@ -125,28 +126,75 @@ void task1UDPConnection( void *pvParameters )
 {
     QueueSendHandle = xQueueCreate(SETTING__NUM_PACKETS_MAX, sizeof(struct TagTxContext));
 
-    union TagRxBuffer         rxBuffers[SETTING__NUM_PACKETS_MAX];
+    union TagRxBuffer         rxBuf;
+    
+    //---------------------------------------
+    // ассоциированы с буферами отправки
+    //---------------------------------------
+
     struct TagTxContext       txItems[SETTING__NUM_PACKETS_MAX];
     enum TagExchangeStatesIds states[SETTING__NUM_PACKETS_MAX];
-    uint8_t currPacketId;
+    TickType_t                momentsOfTxStartLast[SETTING__NUM_PACKETS_MAX]; // (ticks), для простоты начинаем отсчитывать время локально, а не в задаче отправки.
+    uint8_t                   numsOfFailAckReply[SETTING__NUM_PACKETS_MAX];
+    //---------------------------------------
+    uint8_t                   numPacketsInProcessing; // макс. количество находящихся в обработке уникальных входящих пакетов
+    //---------------------------------------
+    static const TickType_t   TIMESPAN_WAIT_ACK_REPLY = pdMS_TO_TICKS(1);/*setting*/
+    static const TickType_t   NUM_OF_FAIL_ACK_REPLY_MAX = 10;/*setting*/
+
+    for (size_t i = 0; i < SETTING__NUM_PACKETS_MAX; ++i)
+    {
+        states[i] = ID_EXCHANGE_STATE__NONE;
+    }
+    numPacketsInProcessing = 0;
+
+    // RX blocking timeout for all RX = 0. Later we won't overwrite it
+    const TickType_t rxTimeOut = 0;
+    FreeRTOS_setsockopt(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
+        0,
+        FREERTOS_SO_RCVTIMEO,
+        &rxTimeOut,
+        sizeof(rxTimeOut) );
 
     while (1)
     {
-        /* Перед новым приёмом 
-        Поиск свободного места в приёмном буфере :
-        если свободное место есть, то принимаем новый пакет
-        если свободного места нет, то пропускаем шаг
-        */
+        /* Если закончился последний тайм-аут ожидания ACK_REPLY, то меняем статус на ...NONE (освобождаем выходной буфер)
+        Поиск статуса ID_EXCHANGE_STATE__WAIT_ACK_REPLY для сравнения с макс. возможным таймаутом неответа */
+        TickType_t t = GetTickCount();
+        for ( size_t i = 0 ; i < SETTING__NUM_PACKETS_MAX; i++ )
+        {
+            if ( states[i] == ID_EXCHANGE_STATE__WAIT_ACK_REPLY )
+            {
+                if ( (t - momentsOfTxStartLast[i] >= TIMESPAN_WAIT_ACK_REPLY) &&
+                     ( numsOfFailAckReply[i] >= NUM_OF_FAIL_ACK_REPLY_MAX )
+                    )
+                {
+                    states[i] = ID_EXCHANGE_STATE__NONE;
+                    configASSERT(numPacketsInProcessing-- == 0);
+                }
+            }
+        }
 
-        /* Read new RX packet with command */
 
-        // RX blocking time = 0
-        const TickType_t rxTimeOut = 0;
-        FreeRTOS_setsockopt(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
-            0,
-            FREERTOS_SO_RCVTIMEO,
-            &rxTimeOut,
-            sizeof(rxTimeOut));
+
+
+        /* Read new RX packet */
+        // + ничего не принято: критерий - (rxNum <= 0)
+        // ------ ищем state == ID_EXCHANGE_STATE__NEED_REPEAT_REPLY, если нашли - переход к повторной отправке буфера, 
+        // иначе - ищем state == ID_EXCHANGE_STATE__WAIT_ACK_REPLY, если нашли - переход к проверке истечения тайм-аута
+        // 
+        // - принято с логической ошибкой (неизвестный номер команды, количество байт не соответствует номеру команды) - считаем что такого быть не может
+        // 
+        // + пакет с данными: критерий - (cmd == CMD_READ) || (cmd == CMD_WRITE)
+        // ++ повторно: критерий - (в выходном буфере есть такой же ID) - собрать ACK_REQ, отправить, собрать ответный пакет - перейти к след. этапу
+        // ++ первично: критерий - (иначе) - выполнить, собрать ACK_REQ, отправить, собрать ответный пакет - перейти к след. этапу
+        // 
+        // - REPLY_ACK с логической ошибкой неправильным ID - такой ID не существует в нашем буфере - считаем что такого быть не может
+        // + REPLY_ACK - если у вых. буфера с ID state == ID_EXCHANGE_STATE__WAIT_ACK_REPLY, то установить state = NONE
+        // ----- если status == ID_EXCHANGE_STATE__WAIT_ACK_REPLY - то установить статус ID_EXCHANGE_STATE__NONE, иначе -  - перейти к след. этапу
+
+
+
 
         int32_t rxNum = FreeRTOS_recvfrom(((struct TagParamsOfUDPConnectionTask*)pvParameters)->ClientSocket,
             &rxBuf, sizeof(rxBuf) /* = максимальный размер входящего пакета */,
@@ -154,40 +202,52 @@ void task1UDPConnection( void *pvParameters )
             ((struct TagParamsOfUDPConnectionTask*)pvParameters)->PtrDestinationAddress,
             & ((struct TagParamsOfUDPConnectionTask*)pvParameters)->SourceAddressLength /* Not used but should be set as shown. */
         );
-        if (rxNum <= 0) { continue; } // continue receive on error
-        /* Check packet consistency */
-        /* Проверяем соответствие количества байт и кода команды
-        */
-        if (rxBuf.FormatCmdRead.Cmd == CMD_READ && rxNum == sizeof(rxBuf.FormatCmdRead)) { ; /* ok */ }
-        else if (rxBuf.FormatCmdWrite.Cmd == CMD_WRITE && rxNum == sizeof(rxBuf.FormatCmdWrite)) { ; /* ok */ }
-        else
-        {
-            continue; // Игнорируем и продолжаем принимать, т.к. других сообщений на этом этапе быть не должно.
-        }
+        if (rxNum > 0)
+        { // если успешно приняты данные
+            /* Check packet consistency */
+            /* Проверяем соответствие количества байт и кода команды
+            */
+            if (rxBuf.FormatCmdRead.Cmd == CMD_READ && rxNum == sizeof(rxBuf.FormatCmdRead)) { ; /* ok */ }
+            else if (rxBuf.FormatCmdWrite.Cmd == CMD_WRITE && rxNum == sizeof(rxBuf.FormatCmdWrite)) { ; /* ok */ }
+            else
+            {
+                continue; // Игнорируем и продолжаем принимать, т.к. других сообщений на этом этапе быть не должно.
+            }
+			/* Перед формированием нового ответного пакета:
+			Поиск свободного выходного буфера (критерий - статус):
+            */
+			uint8_t idOfFreeTxBuffer = 0; // если >= SETTING__NUM_PACKETS_MAX, то нет свободного буфера
+			for (  ; idOfFreeTxBuffer < SETTING__NUM_PACKETS_MAX; ++idOfFreeTxBuffer)
+			{
+                if ( states[idOfFreeTxBuffer] == ID_EXCHANGE_STATE__NONE )
+                {
+					break; // в idOfFreeTxBuffer сохранится индекс
+                }
+            }
+            /* Send REQ_ACK for "cmd" packets */
+            txBuf.FormatAckRequest.Id = rxBuf.FormatCmdRead.Id;
+            txBuf.FormatAckRequest.AckRequest = CMD_ACK;
+            // TODO: 
+             /*TODO: размер пакета передавать в очереди*/
+            while (pdTRUE != xQueueSendToBack(QueueSendHandle, &txItem, 1)) { ; }
 
-        /* Send REQ_ACK for "cmd" packets */
-        txBuf.FormatAckRequest.Id = rxBuf.FormatCmdRead.Id;
-        txBuf.FormatAckRequest.AckRequest = CMD_ACK;
-        // TODO: 
-         /*TODO: размер пакета передавать в очереди*/
-        while (pdTRUE != xQueueSendToBack(QueueSendHandle, &txItem, 1)) { ; }
+            /* Parse cmd packet, execute command and build tx packet */
+            uint32_t regReadValOrWriteStatus;
+            switch (rxBuf.FormatCmdRead.Cmd)
+            {
+            case CMD_READ:
+                regReadValOrWriteStatus = reg_read( FreeRTOS_ntohl(rxBuf.FormatCmdRead.RegAddr) );
+                // ID транзакции установили в буфере, когда отсылали ACK_REQ
+                txBuf.FormatCmdAnswer.RDataOrWStatus = FreeRTOS_htonl(regReadValOrWriteStatus);
+                break;
 
-        /* Parse cmd packet, execute command and build tx packet */
-        uint32_t regReadValOrWriteStatus;
-        switch (rxBuf.FormatCmdRead.Cmd)
-        {
-        case CMD_READ:
-            regReadValOrWriteStatus = reg_read( FreeRTOS_ntohl(rxBuf.FormatCmdRead.RegAddr) );
-            // ID транзакции установили в буфере, когда отсылали ACK_REQ
-            txBuf.FormatCmdAnswer.RDataOrWStatus = FreeRTOS_htonl(regReadValOrWriteStatus);
-            break;
-
-        case CMD_WRITE:
-            regReadValOrWriteStatus = reg_write(FreeRTOS_ntohl(rxBuf.FormatCmdWrite.RegAddr),
-                FreeRTOS_ntohl(rxBuf.FormatCmdWrite.ValueToWrite));
-            // ID установили, когда отсылали ACK_REQ
-            txBuf.FormatCmdAnswer.RDataOrWStatus = FreeRTOS_htonl(regReadValOrWriteStatus);
-            break;
+            case CMD_WRITE:
+                regReadValOrWriteStatus = reg_write(FreeRTOS_ntohl(rxBuf.FormatCmdWrite.RegAddr),
+                    FreeRTOS_ntohl(rxBuf.FormatCmdWrite.ValueToWrite));
+                // ID установили, когда отсылали ACK_REQ
+                txBuf.FormatCmdAnswer.RDataOrWStatus = FreeRTOS_htonl(regReadValOrWriteStatus);
+                break;
+            }
         }
 
         /****************************************/
