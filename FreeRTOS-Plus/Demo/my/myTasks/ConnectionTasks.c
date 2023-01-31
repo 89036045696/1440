@@ -164,29 +164,6 @@ uint8_t FindTransactionIdInArray(uint8_t  ArgId, struct TagTxContext* ArgArrTxIt
     return ArgArrLen;
 }
 //==============================================================================
-/**
- \return - true: данные прин€ты в буфер \arg ArgPtrBuf
-*/
-bool TryToReceive(struct TagParamsOfUDPConnectionTask* ArgParams, union TagRxBuffer* ArgPtrBuf)
-{
-    // RX blocking time = 0
-    const TickType_t rxTimeOut = 0;
-    FreeRTOS_setsockopt(ArgParams->ClientSocket,
-        0,
-        FREERTOS_SO_RCVTIMEO,
-        &rxTimeOut,
-        sizeof(rxTimeOut));
-
-    int32_t rxNum = FreeRTOS_recvfrom(ArgParams->ClientSocket,
-        ArgPtrBuf, sizeof(union TagRxBuffer) /* = максимальный размер вход€щего пакета */,
-        0 /* ulFlags with the FREERTOS_ZERO_COPY bit clear. */,
-        ArgParams->PtrDestinationAddress,
-        &ArgParams->SourceAddressLength /* Not used but should be set as shown. */
-    );
-
-    return rxNum > 0;
-}
-//==============================================================================
 void StartToTransmit( const struct TagTxContext * ArgPtrContext )
 {
     // TODO: мониторить врем€ блокировки в реальных услови€х и если оно велико, то либо увеличивать размер очереди, либо отмен€ть ответ
@@ -210,8 +187,6 @@ void task1UDPConnection( void *pvParameters )
     TickType_t                momentsOfTxStartLast[SETTING__NUM_PACKETS_MAX]; // (ticks), дл€ простоты начинаем отсчитывать врем€ локально, а не в задаче отправки.
     uint8_t                   numsOfFailAckReply[SETTING__NUM_PACKETS_MAX]; // TODO: инициализировать и измен€ть в коде
     //---------------------------------------
-// TODO: это нужно?    uint8_t                   numPacketsInProcessing; // макс. количество наход€щихс€ в обработке уникальных вход€щих пакетов
-    //---------------------------------------
     static const TickType_t   TIMESPAN_WAIT_ACK_REPLY = pdMS_TO_TICKS(1);/*setting*/
     static const TickType_t   NUM_OF_FAIL_ACK_REPLY_MAX = 10;/*setting*/
 
@@ -219,7 +194,6 @@ void task1UDPConnection( void *pvParameters )
     {
         states[i] = ID_EXCHANGE_STATE__NONE;
     }
-    // TODO: это нужно?    numPacketsInProcessing = 0;
 
     txContextAckReq.Packet.FormatAckRequest.AckRequest = CMD_ACK; // значение далее мен€тьс€ не будет
     txContextAckReq.SizeOfPacket = sizeof( txContextAckReq.Packet.FormatAckRequest );
@@ -254,7 +228,6 @@ void task1UDPConnection( void *pvParameters )
                     if (states[idOfTxBuf] == ID_EXCHANGE_STATE__WAIT_ACK_REPLY)
                     {
                         states[idOfTxBuf] = ID_EXCHANGE_STATE__NONE; // транзакци€ успешно завершена, буфер можно освободить
-                        // TODO: это нужно?                    configASSERT(numPacketsInProcessing-- != 0);
                     }
                     else { /* тихо игнорируем вход€щий пакет */ }
                 }
@@ -349,7 +322,6 @@ void task1UDPConnection( void *pvParameters )
                     {
                         /* ≈сли закончилс€ последний тайм-аут неответа ACK_REPLY, то освобождаем выходной буфер */
                         states[i] = ID_EXCHANGE_STATE__NONE;
-                        // TODO: это нужно?                    configASSERT(numPacketsInProcessing-- != 0);
                     }
                 }
             }
