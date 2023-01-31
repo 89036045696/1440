@@ -338,7 +338,7 @@ void task1UDPConnection( void *pvParameters )
         {
             if (states[i] == ID_EXCHANGE_STATE__WAIT_ACK_REPLY)
             {
-                if ( t - (momentsOfTxStartLast[i] + TIMESPAN_WAIT_ACK_REPLY) <= t )
+                if ( t - momentsOfTxStartLast[i] <= TIMESPAN_WAIT_ACK_REPLY )
                 {
                     if (numsOfFailAckReply[i] < NUM_OF_FAIL_ACK_REPLY_MAX)
                     {
