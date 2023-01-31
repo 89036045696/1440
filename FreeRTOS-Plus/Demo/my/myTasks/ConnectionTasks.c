@@ -315,7 +315,7 @@ void task1UDPConnection( void *pvParameters )
                     if (idOfTxBufToConstruct < SETTING__NUM_PACKETS_MAX)
                     { // найден индекс
                         // выполнение команды и сборка выходного пакета
-                        uint32_t regWriteStatus = reg_write(FreeRTOS_ntohl(rxBuf.FormatCmdWrite.RegAddr, rxBuf.FormatCmdWrite.ValueToWrite));
+                        uint32_t regWriteStatus = reg_write(FreeRTOS_ntohl(rxBuf.FormatCmdWrite.RegAddr), FreeRTOS_ntohl(rxBuf.FormatCmdWrite.ValueToWrite));
                         txContexts[idOfTxBufToConstruct].Packet.FormatCmdAnswer.Id = rxBuf.FormatCmdWrite.Id;
                         txContexts[idOfTxBufToConstruct].Packet.FormatCmdAnswer.Cmd = rxBuf.FormatCmdWrite.Cmd;
                         txContexts[idOfTxBufToConstruct].Packet.FormatCmdAnswer.RDataOrWStatus = FreeRTOS_htonl(regWriteStatus);
